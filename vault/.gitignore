@@ -1,0 +1,5 @@
+.env
+cache/
+out/
+broadcast/*/31337/
+lib/
