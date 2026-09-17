@@ -4,14 +4,16 @@ On-chain portfolio risk engine using CME's SPAN methodology, computed natively i
 
 ## Structure
 
-- `contract/` — the SPAN risk engine, Rust compiled to WASM via Arbitrum Stylus
-- `vault/` — Solidity: the credit vault, price relay, debt token, mock NVDA collateral
-- `web/` — Next.js frontend: scanner, vault, ecosystem view, methodology page
+- `contract/`: the SPAN risk engine, Rust compiled to WASM via Arbitrum Stylus
+- `vault/`: Solidity, the credit vault, price relay, debt token, mock NVDA collateral, and a second example contract (`AgentMarginGuard`) that consumes the same engine independently
+- `web/`: Next.js frontend, scanner, vault, ecosystem view, methodology page
+- `sdk/`: standalone TypeScript client for reading a wallet's risk from any app
 
 ## Deployed on Robinhood Chain testnet (chain id 46630)
 
 - SPAN engine: `0xb20DBe9223C2a6538cD5F9Ffb8CB7a1a5c827D62`
 - SpanCreditVault: `0xB763256f9b121516aC0e62298a2f33c623c4D99a`
+- AgentMarginGuard: `0x0B7Acde7300F164F8dfa4d7dDf89B5B514DcAe53`
 - PriceRelay: `0x8450649468613a5073030724d3e6D4681af6794D`
 - Undertow Dollar (uUSD): `0x4444A7d9E919D8B1dE6E9298a3B9A8acAD362f1C`
 - MockNVDA: `0x69743F43f7D41cc61d7Abce7C1cf0DBcE556EeE6`
@@ -25,6 +27,21 @@ npm run dev
 ```
 
 Needs a `.env.local` with the contract addresses above and a keeper private key that relays mainnet prices onto testnet.
+
+## Using the risk engine from another app
+
+```
+npm install ./sdk viem
+```
+
+```ts
+import { UndertowRiskClient } from "@undertow-risk/sdk";
+
+const undertow = new UndertowRiskClient("0xb20DBe9223C2a6538cD5F9Ffb8CB7a1a5c827D62");
+const { safeBorrowCapacityUsd } = await undertow.getAccountRisk(walletAddress);
+```
+
+See `sdk/README.md` for details.
 
 ## Methodology
 

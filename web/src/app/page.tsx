@@ -81,12 +81,6 @@ const PRESET_WALLETS = [
   },
 ] as const;
 
-const FEATURES = [
-  { icon: "◐", title: "The surface", body: "Real holdings, read live from the chain the moment you scan." },
-  { icon: "↝", title: "The pull", body: "Real prices, stressed across 16 scenarios clearinghouses have used since 1988." },
-  { icon: "◈", title: "The undertow", body: "A correlation credit, computed on chain in Rust via Arbitrum Stylus." },
-];
-
 export default function Home() {
   const { address: connectedAddress, isConnected } = useAccount();
   const [input, setInput] = useState("");
@@ -151,8 +145,7 @@ export default function Home() {
               <p className="mt-5 max-w-lg text-[15px] leading-relaxed text-[#6b7280]">
                 Paste any wallet address, no login needed, to see its real holdings and real live
                 prices stress tested across the same 16-scenario grid real clearinghouses have used
-                since 1988. Connect your own wallet if you want it remembered and watched. The math
-                runs on chain either way. Nothing simulated anywhere.
+                since 1988. Nothing simulated anywhere.
               </p>
 
               {isConnected && connectedAddress && (
@@ -243,28 +236,15 @@ export default function Home() {
             </div>
 
             <div className="sm:col-span-2">
-              <div className="grid gap-4 sm:grid-cols-3">
-                {FEATURES.map((f) => (
-                  <div key={f.title} className="rounded-2xl border border-[#e5e7eb] bg-[#f7f7f9] p-5">
-                    <span className="flex h-8 w-8 items-center justify-center rounded-full bg-[#f3e8ff] text-[#7c3aed]">
-                      {f.icon}
-                    </span>
-                    <p className="mt-3 font-[family-name:var(--font-display)] text-base font-bold">{f.title}</p>
-                    <p className="mt-1 text-xs leading-relaxed text-[#6b7280]">{f.body}</p>
-                  </div>
-                ))}
-              </div>
-
-              <div className="mt-4 rounded-2xl border border-[#ddd6fe] bg-[#f3e8ff] p-5">
+              <div className="rounded-2xl border border-[#ddd6fe] bg-[#f3e8ff] p-5">
                 <p className="font-[family-name:var(--font-display)] text-base font-bold text-[#7c3aed]">
-                  Built as public infrastructure, not a walled app
+                  Permissionless risk primitive
                 </p>
                 <p className="mt-1 text-xs leading-relaxed text-[#5b21b6]">
-                  The span engine is a public view function on Robinhood Chain testnet. Any wallet,
-                  dApp, or lending protocol can call it directly to price risk on tokenized
-                  collateral, right now, with no partnership or integration agreement needed.{" "}
+                  Any protocol can query the on-chain SPAN engine directly to price portfolio risk
+                  across tokenized collateral, no partnership needed.{" "}
                   <a href="/methodology#integrate" className="underline decoration-[#7c3aed]/40 hover:text-[#5b21b6]">
-                    See how to call it yourself.
+                    View integration specs.
                   </a>
                 </p>
               </div>
@@ -442,6 +422,11 @@ export default function Home() {
                   </tbody>
                 </table>
               </div>
+              <p className="mt-3 text-xs text-[#9ca3af]">
+                Whitelist restricted to contracts matching Robinhood&apos;s verified proxy pattern
+                with 100k+ distributed holders (TSLA, WETH). A third asset (NVDA) is unlocked in
+                the Vault via a verified mainnet price relay.
+              </p>
             </section>
 
             <div className="my-12 flex items-center gap-3 text-[#e5e7eb]" aria-hidden="true">

@@ -4,7 +4,7 @@ pragma solidity ^0.8.24;
 import { ERC20 } from "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 
 /// @notice Debt token for SpanCreditVault. Minted on borrow, burned on repay
-/// or liquidation. Not pegged, not backed by any reserve — collateral in the
+/// or liquidation. Not pegged, not backed by any reserve, collateral in the
 /// vault is the only backing.
 contract UndertowDollar is ERC20 {
     address public vault;

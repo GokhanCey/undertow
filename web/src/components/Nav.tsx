@@ -6,7 +6,6 @@ import { ConnectButton } from "@rainbow-me/rainbowkit";
 
 const LINKS = [
   { href: "/", label: "Scanner" },
-  { href: "/vault", label: "Vault" },
   { href: "/ecosystem", label: "Ecosystem" },
   { href: "/methodology", label: "Methodology" },
 ];
@@ -25,6 +24,19 @@ export function Nav() {
         </span>
       </Link>
       <nav className="flex items-center gap-7 text-sm font-medium text-[#6b7280]">
+        <Link
+          href="/vault"
+          className={`flex items-center gap-1.5 rounded-lg px-3.5 py-1.5 font-bold transition ${
+            pathname === "/vault"
+              ? "bg-[#6d28d9] text-white"
+              : "bg-[#7c3aed] text-white hover:bg-[#6d28d9]"
+          }`}
+        >
+          Vault
+          <span className="rounded-full bg-white/20 px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide">
+            Live
+          </span>
+        </Link>
         {LINKS.map((link) => (
           <Link
             key={link.href}
@@ -48,7 +60,7 @@ export function Nav() {
         </a>
         <ConnectButton
           showBalance={false}
-          chainStatus="none"
+          chainStatus="icon"
           accountStatus={{ smallScreen: "avatar", largeScreen: "full" }}
         />
       </nav>

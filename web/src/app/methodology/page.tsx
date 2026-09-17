@@ -49,6 +49,12 @@ const CONTRACTS = [
     explorer: "https://explorer.testnet.chain.robinhood.com/address/0xB763256f9b121516aC0e62298a2f33c623c4D99a",
   },
   {
+    label: "AgentMarginGuard (second consumer of the SPAN engine)",
+    network: "Robinhood Chain testnet",
+    address: "0x0B7Acde7300F164F8dfa4d7dDf89B5B514DcAe53",
+    explorer: "https://explorer.testnet.chain.robinhood.com/address/0x0B7Acde7300F164F8dfa4d7dDf89B5B514DcAe53",
+  },
+  {
     label: "PriceRelay",
     network: "Robinhood Chain testnet",
     address: "0x8450649468613a5073030724d3e6D4681af6794D",
@@ -252,6 +258,29 @@ export default function Methodology() {
 });`}
             </pre>
           </div>
+          <div className="mt-4 rounded-2xl border border-[#e5e7eb] bg-[#0f0f14] px-5 py-4">
+            <p className="text-xs font-semibold uppercase tracking-wide text-[#9ca3af]">Or the SDK (sdk/)</p>
+            <pre className="mt-2 overflow-x-auto font-[family-name:var(--font-geist-mono)] text-xs leading-relaxed text-[#e5e7eb]">
+{`import { UndertowRiskClient } from "@undertow-risk/sdk";
+
+const undertow = new UndertowRiskClient(spanEngineAddress);
+const { netMarginUsd, safeBorrowCapacityUsd } =
+  await undertow.getAccountRisk(walletAddress);
+
+if (requestedBorrowUsd > safeBorrowCapacityUsd) {
+  throw new Error("SPAN limit exceeded");
+}`}
+            </pre>
+          </div>
+          <p className="mt-4 text-[15px] leading-relaxed text-[#6b7280]">
+            SpanCreditVault isn&apos;t the only consumer. <code className="rounded bg-[#f7f7f9] px-1.5 py-0.5 font-[family-name:var(--font-geist-mono)] text-[13px]">AgentMarginGuard</code> (<code className="rounded bg-[#f7f7f9] px-1.5 py-0.5 font-[family-name:var(--font-geist-mono)] text-[13px]">vault/src/AgentMarginGuard.sol</code>) is a
+            second, independent contract built around the same interface: an owner deposits
+            collateral and delegates withdrawals to an agent (an automated rebalancing bot, for
+            example), and the contract calls this same SPAN engine before every withdrawal,
+            rejecting it if the resulting portfolio would fall unsafe. It computes the
+            post-withdrawal state from its own storage, never from what the agent claims, so it
+            cannot be lied to. Same engine, same trust model, a completely different application.
+          </p>
         </section>
 
         <section id="why-stylus" className="mt-16 scroll-mt-8">
@@ -334,6 +363,11 @@ export default function Methodology() {
             correlation math, not to simulate real collateral value, so an open mint is honest
             rather than a hidden loophole. The vault UI includes a bounded test-mint button for
             exactly this reason, so trying the 3-asset flow does not require a faucet.
+          </p>
+          <p className="mt-4 text-[15px] leading-relaxed text-[#6b7280]">
+            Undertow sustains itself via a 10 bps protocol fee on uUSD origination and a 1 percent
+            protocol cut of the 5 percent liquidation bonus. This captures value directly from
+            credit velocity and risk-clearing, without needing a speculative governance token.
           </p>
         </section>
 

@@ -2,7 +2,7 @@
 //!
 //! CME SPAN-style worst-case portfolio loss across 16 stress scenarios (price
 //! x volatility grid), plus a correlation-weighted diversification credit.
-//! Runs on Arbitrum Stylus. Pure calculator — balances and prices are read
+//! Runs on Arbitrum Stylus. Pure calculator: balances and prices are read
 //! by the caller and passed in, this contract just does the math.
 //!
 //! Fixed-point convention:
@@ -28,7 +28,7 @@ use stylus_sdk::{alloy_primitives::U256, prelude::*};
 
 /// The 16 SPAN scenarios: price move paired with a volatility move. Spot
 /// holdings don't react to volatility, so each up/down vol pair gives the
-/// same value — matches real SPAN, where vol only affects options. Rows 15
+/// same value, matching real SPAN, where vol only affects options. Rows 15
 /// and 16 are the extreme 2.5x moves, weighted down below.
 const NUM_SCENARIOS: usize = 16;
 
@@ -105,7 +105,7 @@ fn standalone_worst_loss(balance: U256, price: U256, range_bps: U256, wad: U256,
     worst
 }
 
-/// Integer square root (Babylonian method) — no floats in a deterministic,
+/// Integer square root (Babylonian method), no floats in a deterministic,
 /// no_std on-chain contract. Returns floor(sqrt(n)).
 fn isqrt(n: U256) -> U256 {
     if n.is_zero() {
@@ -155,7 +155,7 @@ fn compute_diversification(standalone_losses: &[U256], asset_classes: &[u8]) -> 
 /// Pure SPAN computation, independent of the contract/VM so it's directly unit
 /// testable. Returns (current_portfolio_value, worst_case_loss, worst_scenario_index,
 /// per_scenario_values). Values are 8-decimal USD fixed point (matching `prices`).
-/// `worst_scenario_index` is the scenario (0-15) whose *weighted* loss was largest —
+/// `worst_scenario_index` is the scenario (0-15) whose *weighted* loss was largest,
 /// not necessarily the scenario with the lowest raw portfolio value, since the two
 /// tail scenarios carry partial weight (see `SCENARIO_WEIGHT_BPS`).
 fn compute_scan(balances: &[U256], prices: &[U256], ranges_bps: &[U256]) -> (U256, U256, U256, Vec<U256>) {
@@ -350,7 +350,7 @@ mod test {
     #[test]
     fn two_asset_portfolio_gets_positive_diversification_credit() {
         // Every correlation in our table is < 100%, so any 2+ asset portfolio
-        // must net below the naive sum — that's the whole point of the credit.
+        // must net below the naive sum, that's the whole point of the credit.
         let standalone = vec![usd(300), usd(400)];
         let classes = vec![ASSET_CLASS_EQUITY, ASSET_CLASS_CRYPTO];
         let (gross, net, credit) = compute_diversification(&standalone, &classes);
