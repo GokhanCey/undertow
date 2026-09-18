@@ -3,6 +3,19 @@ import { fetchPortfolio, serializePosition } from "@/lib/portfolio";
 import { computeSpanOnChain, SpanContractNotDeployedError } from "@/lib/span";
 import { WHALE_ADDRESSES } from "@/lib/whales";
 
+interface WhaleData {
+  address: `0x${string}`;
+  empty: false;
+  positions: ReturnType<typeof serializePosition>[];
+  totalValueUsd: string;
+  currentValueUsd: string;
+  worstCaseLossUsd: string;
+  worstScenarioIndex: number;
+  grossLossUsd: string;
+  netMarginUsd: string;
+  diversificationCreditUsd: string;
+}
+
 export async function GET() {
   const results = await Promise.allSettled(
     WHALE_ADDRESSES.map(async (address) => {
@@ -26,29 +39,19 @@ export async function GET() {
     }),
   );
 
-  const whales = results
-    .map((r, i) => {
-      if (r.status === "rejected") {
-        const reason = r.reason instanceof SpanContractNotDeployedError ? "engine_not_deployed" : "read_failed";
-        return { address: WHALE_ADDRESSES[i], failed: true as const, reason };
-      }
-      return r.value;
-    })
-    .filter((w) => !("empty" in w && w.empty));
+  const whales = results.map((r, i) => {
+    if (r.status === "rejected") {
+      const reason = r.reason instanceof SpanContractNotDeployedError ? "engine_not_deployed" : "read_failed";
+      return { address: WHALE_ADDRESSES[i], failed: true as const, reason };
+    }
+    return r.value;
+  });
 
-  const totalTrackedValueUsd = whales.reduce((sum, w) => {
-    if ("totalValueUsd" in w) return sum + BigInt(w.totalValueUsd);
-    return sum;
-  }, 0n);
+  const withData = whales.filter((w): w is WhaleData => "totalValueUsd" in w);
 
-  const totalSystemicRiskUsd = whales.reduce((sum, w) => {
-    if ("worstCaseLossUsd" in w) return sum + BigInt(w.worstCaseLossUsd);
-    return sum;
-  }, 0n);
-
-  const ranked = whales
-    .filter((w): w is Extract<typeof w, { worstCaseLossUsd: string }> => "worstCaseLossUsd" in w)
-    .sort((a, b) => (BigInt(a.worstCaseLossUsd) > BigInt(b.worstCaseLossUsd) ? -1 : 1));
+  const totalTrackedValueUsd = withData.reduce((sum, w) => sum + BigInt(w.totalValueUsd), 0n);
+  const totalSystemicRiskUsd = withData.reduce((sum, w) => sum + BigInt(w.worstCaseLossUsd), 0n);
+  const ranked = withData.sort((a, b) => (BigInt(a.worstCaseLossUsd) > BigInt(b.worstCaseLossUsd) ? -1 : 1));
 
   return NextResponse.json({
     totalTrackedValueUsd: totalTrackedValueUsd.toString(),
